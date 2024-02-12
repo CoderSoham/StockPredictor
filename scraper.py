@@ -3,15 +3,15 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import yfinance as yf
 
-start = dt.datetime(1981, 1, 1)
+start = dt.datetime(2000, 1, 1)
 end = dt.datetime(2024, 1, 1)
 
-tickers = ['AAPL']
+tickers = ['RELIANCE.NS']
 
 data = yf.download(tickers, start=start, end=end)
 
 # Save data to CSV file
-data.to_csv('apple1.csv')
+data.to_csv('reliance.csv')
 
 plt.figure(figsize=(12, 8))
 
