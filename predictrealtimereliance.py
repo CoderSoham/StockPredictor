@@ -15,6 +15,9 @@ data['Date'] = pd.to_datetime(data['Date'])
 model = LinearRegression()
 model.fit(data[['Open', 'High', 'Low', 'Close', 'Volume']], data['Adj Close'])
 
+# Define the window size for the moving average
+window_size = 10
+
 # Fetch real-time data for Reliance Industries
 ticker_symbol = 'RELIANCE.NS'
 
@@ -31,15 +34,28 @@ plt.title(f'Real-Time and Predicted Stock Price for {ticker_symbol}')
 # Initialize the plot with dummy data
 plt.plot([], [], label='Real-Time Price', color='green')
 plt.plot([], [], label='Predicted Price', linestyle='--', color='red')
+plt.plot([], [], label=f'Moving Average ({window_size} days)', linestyle='-.', color='blue')
 
 plt.legend()
 plt.grid(True)
+
+# Function to calculate moving average
+def calculate_moving_average(prices):
+    if len(prices) >= window_size:
+        return sum(prices[-window_size:]) / window_size
+    else:
+        return None
 
 # Function to update the plot
 def update_plot():
     plt.plot(timestamps, prices, label='Real-Time Price', color='green')
     plt.plot(timestamps[-1], prices[-1], marker='o', markersize=5, color='green')  # Highlight the latest real-time point
     plt.plot(timestamps[-1], predicted_price, marker='o', markersize=5, color='red')  # Highlight the predicted point
+    
+    moving_avg = calculate_moving_average(prices)
+    if moving_avg:
+        plt.plot(timestamps[-1], moving_avg, marker='o', markersize=5, color='blue')  # Highlight the moving average point
+    
     plt.legend()
     plt.pause(0.01)
 
