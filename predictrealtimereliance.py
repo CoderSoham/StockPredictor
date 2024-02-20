@@ -1,3 +1,17 @@
+"""
+This code fetches historical data for Reliance Industries from a CSV file, converts it to a DataFrame, and trains a linear regression model using features such as Open, High, Low, Close, and Volume. It then fetches real-time data for Reliance Industries using the yfinance library, continuously updates a plot showing the real-time and predicted stock prices, and calculates the moving average based on the real-time data.
+
+Features:
+- Historical data for Reliance Industries loaded from a CSV file
+- Conversion of 'Date' column to datetime format
+- Training of a linear regression model using historical data
+- Fetching of real-time data for Reliance Industries using the yfinance library
+- Continuous updating of a plot showing real-time and predicted stock prices
+- Calculation of the moving average based on the real-time data
+- Display of the latest real-time point, predicted point, and moving average point on the plot
+- Looping indefinitely to continuously update the plot with real-time data at regular intervals
+
+"""
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
