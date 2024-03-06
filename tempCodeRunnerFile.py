@@ -1,2 +1,2 @@
 
-    google_predicted_price += np.random.normal(scale=0.1)  # Add some random noise to make the prediction
+# Interval for the data (e.g., '1min' for 1-minute interval)
