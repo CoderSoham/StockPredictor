@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 from datetime import datetime
 import time
+from sklearn.model_selection import GridSearchCV
 
 # Load historical data for Google
 google_data = pd.read_csv('google.csv')
@@ -11,9 +12,28 @@ google_data = pd.read_csv('google.csv')
 # Convert 'Date' column to datetime
 google_data['Date'] = pd.to_datetime(google_data['Date'])
 
-# Use historical data to train the Random Forest Regression model
-model = RandomForestRegressor(n_estimators=100, random_state=42)
-model.fit(google_data[['Open', 'High', 'Low', 'Close', 'Volume']], google_data['Adj Close'])
+# Define parameter grid
+param_grid = {
+    'n_estimators': [50, 100, 150],
+    'max_depth': [None, 10, 20],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'max_features': ['auto', 'sqrt']
+}
+
+# Initialize Random Forest Regressor
+model = RandomForestRegressor(random_state=42)
+
+# Perform GridSearchCV for parameter tuning
+grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=3, n_jobs=-1, verbose=2)
+grid_search.fit(google_data[['Open', 'High', 'Low', 'Close', 'Volume']], google_data['Adj Close'])
+
+# Get the best parameters
+best_params = grid_search.best_params_
+print("Best Parameters:", best_params)
+
+# Use best parameters to initialize the model
+model = RandomForestRegressor(random_state=42, **best_params)
 
 # Fetch real-time data for Google
 ticker_symbol = 'GOOGL'

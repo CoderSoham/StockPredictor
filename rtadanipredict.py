@@ -6,7 +6,7 @@ from datetime import datetime
 import time
 
 # Load historical data for Google
-google_data = pd.read_csv('google.csv')
+google_data = pd.read_csv('adanigas.csv')
 
 # Convert 'Date' column to datetime
 google_data['Date'] = pd.to_datetime(google_data['Date'])
@@ -16,7 +16,7 @@ model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(google_data[['Open', 'High', 'Low', 'Close', 'Volume']], google_data['Adj Close'])
 
 # Fetch real-time data for Google
-ticker_symbol = 'GOOGL'
+ticker_symbol = 'ATGL.NS'
 
 # Create empty lists to store real-time data
 google_timestamps = []
@@ -28,6 +28,7 @@ plt.figure(figsize=(12, 6))
 plt.xlabel('Time')
 plt.ylabel('Price')
 plt.title(f'Real-Time and Predicted Stock Price for {ticker_symbol}')
+plt.ion()  # Turn on interactive mode
 
 # Function to calculate moving average
 def calculate_moving_average(prices):
@@ -35,6 +36,7 @@ def calculate_moving_average(prices):
 
 # Function to update the plot
 def update_google_plot():
+    plt.gca().cla()  # Clear the current plot axes
     plt.plot(google_timestamps, google_prices, label='Real-Time Price', color='green')
     plt.plot(google_timestamps, google_predicted_prices, label='Predicted Price', linestyle='--', color='red')
     plt.legend()
@@ -94,13 +96,12 @@ while True:
         end_of_day_price = predict_end_of_day_price(today, google_realtime_data)
 
         # Predict end-of-week price
-        end_of_week_price = predict_end_of_week_price(today, google_realtime_data) 
+        end_of_week_price = predict_end_of_week_price(today, google_realtime_data)
 
         # Predict end-of-month price
         end_of_month_price = predict_end_of_month_price(today, google_realtime_data)
 
         # Update the plot
-        plt.clf()  # Clear the current figure
         update_google_plot()
 
         # Wait for 10 seconds before fetching the next data
