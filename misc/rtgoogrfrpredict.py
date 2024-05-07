@@ -16,7 +16,7 @@ model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(google_data[['Open', 'High', 'Low', 'Close', 'Volume']], google_data['Adj Close'])
 
 # Fetch real-time data for Google
-ticker_symbol = 'GOOGL'
+ticker_symbol = 'GOOG'
 
 # Create empty lists to store real-time data
 google_timestamps = []

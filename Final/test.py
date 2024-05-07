@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 from datetime import datetime
 import time
+import sys
 
 def fetch_data_and_train_model(symbol):
     # Fetch historical data for the stock
@@ -20,6 +21,13 @@ def fetch_data_and_train_model(symbol):
     return model
 
 def predict_and_plot_realtime_price(model, symbol):
+    """
+    Predict and plot real-time stock price using the trained model.
+    
+    Args:
+    - model (RandomForestRegressor): Trained Random Forest Regression model
+    - symbol (str): Stock symbol
+    """
     # Create the plot
     plt.figure(figsize=(12, 6))
     plt.xlabel('Time')
@@ -32,8 +40,8 @@ def predict_and_plot_realtime_price(model, symbol):
     prev_predicted_price = None
     
     # Infinite loop to continuously update the plot with real-time data
-    while True:
-        try:
+    try:
+        while True:
             # Fetch real-time data
             stock = yf.Ticker(symbol)
             realtime_data = stock.history(period='1d')
@@ -51,15 +59,23 @@ def predict_and_plot_realtime_price(model, symbol):
                 realtime_data['Volume'].iloc[-1]
             ]])[0]
             
+            # Calculate the percentage change
+            percentage_change = (predicted_price - latest_price) / latest_price * 100
+            
+            # Calculate y-axis limits based on current price and percentage range
+            ymin = min(latest_price * 0.995, predicted_price * 0.995)
+            ymax = max(latest_price * 1.005, predicted_price * 1.005)
+            
             # Plot only if there's a change in price
             if latest_price != prev_real_price or predicted_price != prev_predicted_price:
                 plt.clf()
                 plt.plot([prev_timestamp, latest_timestamp], [prev_real_price, latest_price], label='Real-Time Price', color='green', marker='o')
                 plt.plot([prev_timestamp, latest_timestamp], [prev_real_price, predicted_price], label='Predicted Price', linestyle='--', color='red', marker='x')
+                plt.ylim(ymin, ymax)  # Set y-axis limits
                 plt.legend()
                 plt.xlabel('Time')
                 plt.ylabel('Price')
-                plt.title(f'Real-Time and Predicted Stock Price for {symbol}')
+                plt.title(f'Real-Time and Predicted Stock Price for {symbol}\nPercentage Error: {percentage_change:.2f}%')
                 plt.pause(0.01)
                 
                 # Update previous data
@@ -69,8 +85,11 @@ def predict_and_plot_realtime_price(model, symbol):
     
             # Wait for 10 seconds before fetching the next data
             time.sleep(10)
-        except Exception as e:
-            print("Error:", e)
+    except KeyboardInterrupt:
+        print("Exiting program...")
+        sys.exit(0)
+    except Exception as e:
+        print("Error:", e)
 
 def main():
     # Ask user for stock symbol

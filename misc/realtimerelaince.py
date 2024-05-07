@@ -23,7 +23,7 @@ ticker_symbol = 'RELIANCE.NS'
 timestamps = []
 prices = []
 predicted_prices = []
-predictions = []
+errors = []
 
 # Create the plot
 plt.figure(figsize=(10, 6))
@@ -41,37 +41,9 @@ plt.grid(True)
 # Function to update the plot
 def update_plot():
     plt.plot(timestamps, prices, label='Real-Time Price', color='green')
-    plt.plot(timestamps[-1], prices[-1], marker='o', markersize=5, color='green')  # Highlight the latest real-time point
-    
-    if predicted_prices:
-        plt.plot(timestamps[-1], predicted_prices[-1], marker='o', markersize=5, color='red')  # Highlight the predicted point
-    
+    plt.plot(timestamps, predicted_prices, label='Predicted Price', linestyle='--', color='red')
     plt.legend()
     plt.pause(0.01)
-
-# Function to predict next minute price direction
-def predict_next_minute():
-    # Extract features for the most recent data point
-    latest_data_point = data.iloc[-1]
-    latest_features = np.array(latest_data_point[['Open', 'High', 'Low', 'Close', 'Volume']]).reshape(1, -1)
-    
-    # Predict the price for the next minute
-    next_minute_price = model.predict(latest_features)[0]
-    
-    # Store the predicted price
-    predicted_prices.append(next_minute_price)
-    
-    # Determine the price direction (up or down)
-    direction = 'Up' if next_minute_price > prices[-1] else 'Down'
-    
-    # Calculate the percentage chance of the predicted direction
-    if direction == 'Up':
-        percentage_chance = 100 * (next_minute_price - prices[-1]) / prices[-1]
-    else:
-        percentage_chance = -100 * (next_minute_price - prices[-1]) / prices[-1]
-    
-    # Store the prediction
-    predictions.append((direction, percentage_chance))
 
 # Infinite loop to continuously update the plot with real-time data
 while True:
@@ -88,14 +60,21 @@ while True:
     timestamps.append(latest_timestamp)
     prices.append(latest_price)
     
+    # Predict the price for the next minute
+    latest_features = np.array(realtime_data[['Open', 'High', 'Low', 'Close', 'Volume']]).reshape(1, -1)
+    next_minute_price = model.predict(latest_features)[0]
+    predicted_prices.append(next_minute_price)
+    
+    # Calculate the error percentage between real-time and predicted data
+    error_percentage = 100 * (next_minute_price - latest_price) / latest_price
+    errors.append(error_percentage)
+    
     # Update the plot
     plt.clf()  # Clear the current figure
     update_plot()
     
-    # Predict next minute price direction every 20 seconds
-    if len(prices) >= 2 and (timestamps[-1] - timestamps[-2]).seconds >= 20:
-        predict_next_minute()
-        print(f'Prediction for next minute: {predictions[-1]}')
+    # Print the error percentage
+    print(f'Error Percentage: {error_percentage:.2f}%')
     
     # Wait for a few seconds before fetching the next data
-    time.sleep(1)
+    time.sleep(5)
