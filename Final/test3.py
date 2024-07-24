@@ -106,3 +106,14 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+'''
+SBIN.NS
+PFC.NS
+RECLTD.NS
+COALINDIA.NS
+NTPC.NS
+BHEL.NS
+BEL.NS
+'''
