@@ -1,2 +1,1 @@
-
-        realtime_data['Open'].iloc[0], 
+dash_daq
